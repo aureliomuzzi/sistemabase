@@ -1,0 +1,78 @@
+version: "3.9"
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: sistemabase-backend
+    restart: unless-stopped
+    volumes:
+      - ./backend:/var/www/html
+    networks:
+      - sistemanet
+    depends_on:
+      - db
+
+  db:
+    image: mariadb:11.4
+    container_name: sistemabase-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: laravel
+      MYSQL_USER: laravel
+      MYSQL_PASSWORD: laravel
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - sistemanet
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: production   # default: produção
+    container_name: sistemabase-frontend
+    restart: unless-stopped
+    networks:
+      - sistemanet
+    ports:
+      - "3000:3000"
+
+  nginx:
+    image: nginx:1.27
+    container_name: sistemabase-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./backend:/var/www/html
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - sistemanet
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:5.2
+    container_name: sistemabase-phpmyadmin
+    restart: unless-stopped
+    environment:
+      PMA_HOST: db
+      PMA_USER: root
+      PMA_PASSWORD: root
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
+    networks:
+      - sistemanet
+
+volumes:
+  db_data:
+
+networks:
+  sistemanet:
+    driver: bridge
