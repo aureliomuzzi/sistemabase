@@ -1,9 +1,14 @@
-🚀 Sistema Base – Laravel + Nuxt + Docker
 
-Este projeto contém uma arquitetura moderna baseada em Laravel (backend), Nuxt (frontend), MariaDB (banco de dados), phpMyAdmin (gerenciamento do banco) e Nginx (proxy reverso e servidor web).
-Tudo rodando em containers Docker, de forma modular e escalável.
+# 🚀 Sistema Base – Laravel + Nuxt + Docker
 
-📂 Estrutura do Projeto
+Este projeto contém uma arquitetura moderna baseada em **Laravel** (backend), **Nuxt** (frontend), **MariaDB** (banco de dados), **phpMyAdmin** (gerenciamento do banco) e **Nginx** (proxy reverso e servidor web).  
+Tudo rodando em containers Docker, de forma modular e escalável.  
+
+---
+
+## 📂 Estrutura do Projeto
+
+```
 .
 ├── backend/              # Aplicação Laravel (PHP 8.3 + Composer)
 │   ├── Dockerfile        # Dockerfile do Laravel
@@ -21,97 +26,116 @@ Tudo rodando em containers Docker, de forma modular e escalável.
 ├── docker-compose.yml    # Orquestra todos os serviços
 ├── Makefile              # Atalhos para simplificar os comandos
 └── README.md             # Este arquivo
+```
 
-🛠️ Serviços
-🔹 Backend (Laravel)
+---
 
-Rodando em PHP 8.3
+## 🛠️ Serviços
 
-Servido pelo Nginx
+### 🔹 Backend (Laravel)
+- Rodando em PHP 8.3
+- Servido pelo Nginx
+- Conectado ao MariaDB
+- Localizado em `backend/`
 
-Conectado ao MariaDB
+### 🔹 Frontend (Nuxt 3)
+- Baseado em Node.js 20
+- Build e servido na porta 3000
+- Localizado em `frontend/`
 
-Localizado em backend/
+### 🔹 Banco de Dados (MariaDB)
+- Imagem oficial `mariadb:11.4`
+- Banco inicial: `laravel`
+- Usuário padrão: `laravel` / Senha: `laravel`
+- Acesso root: `root` / Senha: `root`
 
-🔹 Frontend (Nuxt 3)
+### 🔹 phpMyAdmin
+- Interface web para gerenciamento do banco
+- Conectado ao serviço `db`
+- Usuário e senha conforme definidos no `docker-compose.yml`
 
-Baseado em Node.js 20
+### 🔹 Nginx
+- Responsável por proxy reverso
+- Faz a ponte entre `frontend` e `backend`
+- Configuração em `nginx/default.conf`
 
-Build e servido na porta 3000
+---
 
-Localizado em frontend/
+## ⚡ Comandos Úteis
 
-🔹 Banco de Dados (MariaDB)
-
-Imagem oficial mariadb:11.4
-
-Banco inicial: laravel
-
-Usuário padrão: laravel / Senha: laravel
-
-Acesso root: root / Senha: root
-
-🔹 phpMyAdmin
-
-Interface web para gerenciamento do banco
-
-Conectado ao serviço db
-
-Usuário e senha conforme definidos no docker-compose.yml
-
-🔹 Nginx
-
-Responsável por proxy reverso
-
-Faz a ponte entre frontend e backend
-
-Configuração em nginx/default.conf
-
-⚡ Comandos Úteis
-1. Subir todos os serviços
+### 1. Subir todos os serviços
+```bash
 docker-compose up -d --build
+```
 
-2. Ver logs dos containers
+### 2. Ver logs dos containers
+```bash
 docker-compose logs -f
+```
 
-3. Reiniciar apenas o backend (Laravel)
+### 3. Reiniciar apenas o backend (Laravel)
+```bash
 docker-compose restart backend
+```
 
-4. Entrar no container do backend
+### 4. Entrar no container do backend
+```bash
 docker exec -it sistemabase-backend bash
+```
 
-5. Rodar migrations do Laravel
+### 5. Rodar migrations do Laravel
+```bash
 docker exec -it sistemabase-backend php artisan migrate
+```
 
-6. Derrubar todos os containers
+### 6. Derrubar todos os containers
+```bash
 docker-compose down
+```
 
-7. Derrubar e apagar volumes (reset do banco)
+### 7. Derrubar e apagar volumes (reset do banco)
+```bash
 docker-compose down -v
+```
 
-🌐 Acesso aos Serviços
+---
 
-Frontend (Nuxt) → http://app.localhost
+## 🌐 Acesso aos Serviços
 
-Backend (Laravel) → http://api.localhost
+- **Frontend (Nuxt)** → http://app.localhost  
+- **Backend (Laravel)** → http://api.localhost  
+- **phpMyAdmin** → http://localhost:8080  
 
-phpMyAdmin → http://localhost:8080
+---
 
-🔧 Desenvolvimento
-Rodar Laravel em modo desenvolvimento
+## 🔧 Desenvolvimento
+
+### Rodar Laravel em modo desenvolvimento
+```bash
 docker exec -it sistemabase-backend php artisan serve --host=0.0.0.0 --port=8000
+```
 
-Rodar Nuxt em modo desenvolvimento
+### Rodar Nuxt em modo desenvolvimento
+```bash
 docker exec -it sistemabase-frontend npm run dev -- --host
+```
 
-🚀 Produção
+---
+
+## 🚀 Produção
 
 Na versão de produção, o Nuxt é buildado e servido diretamente pelo container:
 
+```bash
 docker-compose -f docker-compose.yml up -d --build
+```
 
-📌 Exemplos de .env
-🔹 Laravel (backend/.env)
+---
+
+## 📌 Exemplos de `.env`
+
+### 🔹 Laravel (`backend/.env`)
+```env
 APP_NAME=Laravel
 APP_ENV=local
 APP_KEY=
@@ -135,42 +159,60 @@ FILESYSTEM_DISK=local
 QUEUE_CONNECTION=sync
 SESSION_DRIVER=file
 SESSION_LIFETIME=120
+```
 
-🔹 Nuxt (frontend/.env)
+---
+
+### 🔹 Nuxt (`frontend/.env`)
+```env
 # URL do backend Laravel
 NUXT_PUBLIC_API_URL=http://api.localhost
 
 # Porta do frontend
 NUXT_PORT=3000
+```
 
-⚡ Atalhos com Make
+---
 
-Este projeto possui um Makefile que encapsula os comandos mais usados do Docker e Artisan.
+## ⚡ Atalhos com Make
+
+Este projeto possui um **Makefile** que encapsula os comandos mais usados do Docker e Artisan.  
 Na raiz do projeto, você pode usar:
 
-Containers
+### Containers
+```bash
 make up          # Subir todos os serviços
 make down        # Derrubar todos os serviços
 make reset       # Derrubar e apagar volumes (reset banco)
 make logs        # Ver logs
 make restart     # Reiniciar containers
 make ps          # Listar containers ativos
+```
 
-Backend (Laravel)
+### Backend (Laravel)
+```bash
 make migrate          # Rodar migrations
 make seed             # Rodar seeders
 make artisan cmd="tinker"   # Executar comando artisan (exemplo)
 make backend-bash     # Entrar no container backend
+```
 
-Frontend (Nuxt)
+### Frontend (Nuxt)
+```bash
 make frontend-dev     # Rodar Nuxt em modo desenvolvimento
 make frontend-build   # Fazer build de produção
 make frontend-bash    # Entrar no container frontend
+```
 
-📌 Observações
+---
 
-O volume db_data garante persistência do banco de dados mesmo após reiniciar os containers.
+## 🖼️ Arquitetura do Sistema
 
-Você pode personalizar as variáveis de ambiente no docker-compose.yml.
+![Arquitetura do Sistema](arquitetura_sistemabase.png)
 
-Para ambientes de produção, recomenda-se configurar .env com credenciais seguras.
+---
+
+## 📌 Observações
+- O volume `db_data` garante persistência do banco de dados mesmo após reiniciar os containers.  
+- Você pode personalizar as variáveis de ambiente no `docker-compose.yml`.  
+- Para ambientes de produção, recomenda-se configurar **.env** com credenciais seguras.  
